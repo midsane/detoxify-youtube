@@ -26,9 +26,17 @@ h1 img {
   margin-bottom: 15px;
   padding: 8px;
   border-radius: 10px;
-  background-color: rgb(65, 67, 67);
+  background-color: rgb(88, 91, 91);
   color: rgb(247, 247, 247);
   opacity: 0.9;
+}
+
+.entrylist{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  max-height: 200px;
+  overflow-y: scroll;
 }
 
 .actions {
@@ -103,6 +111,33 @@ h1 img {
   border-radius: 5px;
 }
 
+.view-all {
+  display: flex;
+  gap: 12px;
+  height: fit-content;
+  padding: 0px 10px;
+  border-radius: 20px;
+  justify-content: center;
+  align-items: center;
+  transition: ease 100ms all;
+}
+
+
+button{
+  transition: all 100ms ease;
+}
+.view-all:active{
+  scale: 0.9;
+}
+
+button:active{
+  scale: 0.9;
+}
+
+.view-all:hover{
+  background-color: rgb(131, 127, 127);
+}
+
 .modal-header {
   font-size: 18px;
   margin-bottom: 15px;
@@ -119,10 +154,13 @@ h1 img {
   display: flex;
   flex-wrap: wrap;
   gap: 5px;
-  max-height: 40px;
-  overflow-y: scroll;
 }
 
+
+.view-all img{
+  width: 10px;
+  aspect-ratio: 1/1;
+}
 
 .dialog-savebutton, .dialog-closebutton{
   cursor:pointer;

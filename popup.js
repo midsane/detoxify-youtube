@@ -1,8 +1,6 @@
-// Fetch stored data when popup opens
 chrome.storage.local.get(
   ["relevantTags", "whitelistedChannels", "blacklistedChannels"],
   (result) => {
-    console.log(result); // Debugging line to check if data is retrieved
 
     let tags = result.relevantTags || ["education", "tutorial", "programming"];
     let whitelistedChannels = result.whitelistedChannels || [];
@@ -14,54 +12,66 @@ chrome.storage.local.get(
 
     updatingContentjs(tags);
 
-    // Add tag functionality
     document.getElementById("addTagButton").addEventListener("click", () => {
-      console.log("Add Tag Button Clicked"); // Debugging line
       chrome.storage.local.get(["relevantTags"], (result) => {
         const tags = result.relevantTags || [];
         showDialog("Enter a new tag", tags);
       });
     });
 
-    // Add channel functionality for whitelisted and blacklisted
     document
       .getElementById("addWhitelistedButton")
       .addEventListener("click", () => {
-        console.log("Add Whitelisted Channel Button Clicked"); // Debugging line
-        showChannelDialog("Enter a new whitelisted channel", "whitelisted");
+         chrome.storage.local.get(["whitelistedChannels"], (result) => {
+        const whitelistedChannels = result.whitelistedChannels || [];
+        showChannelDialog("white list channels","whitelistedChannels", whitelistedChannels);
+      });
       });
 
     document
       .getElementById("addBlacklistedButton")
-      .addEventListener("click", () => {
-        console.log("Add Blacklisted Channel Button Clicked"); // Debugging line
-        showChannelDialog("Enter a new blacklisted channel", "blacklisted");
+     .addEventListener("click", () => {
+         chrome.storage.local.get(["blacklistedChannels"], (result) => {
+        const blacklistedChannels = result.blacklistedChannels || [];
+        showChannelDialog("black list channels","blacklistedChannels", blacklistedChannels);
+      });
       });
 
-    // View more functionality
     document
       .getElementById("viewMoreWhitelisted")
       .addEventListener("click", () => {
-        updateWhitelistedChannelsList(whitelistedChannels, true);
+        listDialog(
+          header = "view all white listed channels",
+          para = "make sure you enter the exact channel name as it is! any videos from this channel will always be shown!",
+          type = "whitelisted",
+        );
       });
 
     document
       .getElementById("viewMoreBlacklisted")
       .addEventListener("click", () => {
-        updateBlacklistedChannelsList(blacklistedChannels, true);
+        listDialog(
+          header = "view all black listed channels",
+          para = "make sure you enter the exact channel name as it is! all videos from this channel will be hidden",
+          type = "blacklisted",
+        );
       });
 
     document.getElementById("viewMoreTags").addEventListener("click", () => {
-      updateTagsList(tags); // Show all tags when clicked
+      listDialog(
+        header = "view all tags",
+        para = "only videos that have one of these tags in their title or description will be shown",
+        type = "tags",
+      );
     });
   }
 );
 
-function updateTagsList(tags, showAll = false) {
+function updateTagsList(tags, showAll=false) {
   const tagsList = document.getElementById("tagsPreview");
-  tagsList.innerHTML = ""; // Clear the list
+  tagsList.innerHTML = "";
 
-  const tagsToDisplay = showAll ? tags : tags.slice(0, 3);
+  const tagsToDisplay = showAll? tags : tags.slice(0,3);
   tagsToDisplay.forEach((tag) => {
     const tagElement = document.createElement("div");
     tagElement.className = "tag";
@@ -74,25 +84,15 @@ function updateTagsList(tags, showAll = false) {
     tagElement.appendChild(removeButton);
     tagsList.appendChild(tagElement);
   });
-
-  // Add "View All" or "View Less" button
-  if (tags.length > 3) {
-    const viewButton = document.createElement("span");
-    viewButton.textContent = showAll ? "... View less" : "... View all";
-    viewButton.className = "action-link";
-    viewButton.addEventListener("click", () => {
-      updateTagsList(tags, !showAll);
-    });
-    tagsList.appendChild(viewButton);
-  }
+  return tags
 }
 
 function updateWhitelistedChannelsList(whitelisted, showAll = false) {
   const whitelistedList = document.getElementById("whitelistedChannelsPreview");
-  whitelistedList.innerHTML = ""; // Clear the list
+  whitelistedList.innerHTML = "";
 
-  const whitelistedToDisplay = showAll ? whitelisted : whitelisted.slice(0, 3);
-  whitelistedToDisplay.forEach((channel) => {
+  const whiteListedToDisplay = showAll ? whitelistedList: whitelisted.slice(0,3);
+  whiteListedToDisplay.forEach((channel) => {
     const channelElement = document.createElement("div");
     channelElement.className = "channel";
     channelElement.textContent = channel;
@@ -105,26 +105,18 @@ function updateWhitelistedChannelsList(whitelisted, showAll = false) {
 
     channelElement.appendChild(removeButton);
     whitelistedList.appendChild(channelElement);
+  
   });
 
-  // Add "View All" or "View Less" button for whitelisted
-  if (whitelisted.length > 3) {
-    const viewMoreButton = document.createElement("span");
-    viewMoreButton.textContent = showAll ? "... View less" : "... View all";
-    viewMoreButton.className = "action-link";
-    viewMoreButton.addEventListener("click", () =>
-      updateWhitelistedChannelsList(whitelisted, !showAll)
-    );
-    whitelistedList.appendChild(viewMoreButton);
-  }
+  return whiteListedToDisplay;
 }
 
-function updateBlacklistedChannelsList(blacklisted, showAll = false) {
+function updateBlacklistedChannelsList(blacklisted, showAll=false) {
   const blacklistedList = document.getElementById("blacklistedChannelsPreview");
-  blacklistedList.innerHTML = ""; // Clear the list
+  blacklistedList.innerHTML = "";
 
-  const blacklistedToDisplay = showAll ? blacklisted : blacklisted.slice(0, 3);
-  blacklistedToDisplay.forEach((channel) => {
+  const blackListedToDisplay = showAll ? blacklisted : blacklisted.slice(0,3);
+  blackListedToDisplay.forEach((channel) => {
     const channelElement = document.createElement("div");
     channelElement.className = "channel";
     channelElement.textContent = channel;
@@ -138,24 +130,14 @@ function updateBlacklistedChannelsList(blacklisted, showAll = false) {
     channelElement.appendChild(removeButton);
     blacklistedList.appendChild(channelElement);
   });
-
-  // Add "View All" or "View Less" button for blacklisted
-  if (blacklisted.length > 3) {
-    const viewMoreButton = document.createElement("span");
-    viewMoreButton.textContent = showAll ? "... View less" : "... View all";
-    viewMoreButton.className = "action-link";
-    viewMoreButton.addEventListener("click", () =>
-      updateBlacklistedChannelsList(blacklisted, !showAll)
-    );
-    blacklistedList.appendChild(viewMoreButton);
-  }
+  return blackListedToDisplay
 }
 
 function removeTag(tag) {
   chrome.storage.local.get(["relevantTags"], (result) => {
     const updatedTags = result.relevantTags.filter((t) => t !== tag);
     chrome.storage.local.set({ relevantTags: updatedTags }, () => {
-      updateTagsList(updatedTags); // Refresh the tags list
+      updateTagsList(updatedTags); 
     });
   });
 }
@@ -177,7 +159,7 @@ function removeChannel(channel, type) {
 
 function showDialog(message, tags) {
   const dialogOverlay = document.createElement("div");
-  dialogOverlay.className = "modal-overlay"; // Use modal styling
+  dialogOverlay.className = "modal-overlay"; 
 
   const dialogContent = document.createElement("div");
   dialogContent.className = "modal-content";
@@ -221,9 +203,20 @@ function showDialog(message, tags) {
   document.body.appendChild(dialogOverlay);
 }
 
-function showChannelDialog(message, type) {
+const updatingContentjs = (tags) => {
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    if (tabs[0] && tabs[0].url.includes("https://www.youtube.com/")) {
+      chrome.tabs.sendMessage(tabs[0].id, {
+        action: "updateRelevantTags",
+        tags: tags,
+      });
+    }
+  });
+};
+
+function showChannelDialog(message, type, channel) {
   const dialogOverlay = document.createElement("div");
-  dialogOverlay.className = "modal-overlay"; // Use modal styling
+  dialogOverlay.className = "modal-overlay"; 
 
   const dialogContent = document.createElement("div");
   dialogContent.className = "modal-content";
@@ -236,32 +229,30 @@ function showChannelDialog(message, type) {
 
   const saveButton = document.createElement("button");
   saveButton.textContent = "Save";
-  saveButton.className = "dialog-savebutton"
+  saveButton.className = "dialog-savebutton";
   saveButton.addEventListener("click", () => {
     const newChannel = inputField.value.trim();
-    if (newChannel) {
-      chrome.storage.local.get([`${type}Channels`], (result) => {
-        let channels = result[`${type}Channels`] || [];
-        if (!channels.includes(newChannel)) {
-          channels.push(newChannel);
-          chrome.storage.local.set({ [`${type}Channels`]: channels }, () => {
-            if (type === "whitelisted") {
-              updateWhitelistedChannelsList(channels);
-            } else {
-              updateBlacklistedChannelsList(channels);
-            }
-          });
-        } else {
-          alert("Channel already exists!");
-        }
-      });
-    }
+     if (newChannel && !channel.includes(newChannel)) {
+       channel.push(newChannel);
+       chrome.storage.local.set({ [type]: channel }, () => {
+         if (type === "blacklistedChannels") 
+          updateBlacklistedChannelsList(channel);
+          
+        else updateWhitelistedChannelsList(channel);
+
+        //updatingContentjs(channel);
+          
+       });
+     } else {
+       alert("input cannot be empty or already exists!");
+     }
+   
     document.body.removeChild(dialogOverlay);
   });
 
   const closeButton = document.createElement("button");
   closeButton.textContent = "Close";
-  closeButton.className ="dialog-closebutton"
+  closeButton.className = "dialog-closebutton";
   closeButton.addEventListener("click", () => {
     document.body.removeChild(dialogOverlay);
   });
@@ -275,13 +266,135 @@ function showChannelDialog(message, type) {
   document.body.appendChild(dialogOverlay);
 }
 
-const updatingContentjs = (tags) => {
-  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    if (tabs[0] && tabs[0].url.includes("https://www.youtube.com/")) {
-      chrome.tabs.sendMessage(tabs[0].id, {
-        action: "updateRelevantTags",
-        tags: tags,
-      });
-    }
-  });
+const listDialog = (
+  header = "view all tags",
+  para = "relevant videos are those videos which have one of these tags as a substring in their title or description",
+  type = "tags",
+) => {
+  let list = [];
+  switch(type){
+    case "tags":
+          chrome.storage.local.get(["relevantTags"], (result) => {
+            list = result.relevantTags || [];
+            const entryList = document.createElement("div");
+            entryList.className = "entrylist"
+            list.forEach((l) => {
+              const channelElement = document.createElement("div");
+              channelElement.className = "tags";
+              channelElement.textContent = l;
+
+              const removeButton = document.createElement("button");
+              removeButton.textContent = "x";
+              removeButton.addEventListener("click", () =>
+                removeTag(l, "tags")
+              );
+
+              channelElement.appendChild(removeButton);
+              entryList.appendChild(channelElement);
+            });
+
+            const closeButton = document.createElement("button");
+            closeButton.textContent = "Close";
+            closeButton.className = "dialog-closebutton";
+            closeButton.addEventListener("click", () => {
+              document.body.removeChild(dialogOverlay);
+            });
+
+            dialogContent.appendChild(dialogMessage);
+            dialogContent.appendChild(paraText);
+            dialogContent.appendChild(entryList);
+            dialogContent.appendChild(closeButton);
+            dialogOverlay.appendChild(dialogContent);
+
+            document.body.appendChild(dialogOverlay);
+          });
+          break;
+    case "whitelisted":
+            chrome.storage.local.get(["whitelistedChannels"], (result) => {
+              list = result.whitelistedChannels || [];
+              const entryList = document.createElement("div");
+              entryList.className = "entrylist";
+              list.forEach((l) => {
+                const channelElement = document.createElement("div");
+                channelElement.className = "tags";
+                channelElement.textContent = l;
+
+                const removeButton = document.createElement("button");
+                removeButton.textContent = "x";
+                removeButton.addEventListener("click", () =>
+                  removeTag(l, "tags")
+                );
+
+                channelElement.appendChild(removeButton);
+                entryList.appendChild(channelElement);
+              });
+
+              const closeButton = document.createElement("button");
+              closeButton.textContent = "Close";
+              closeButton.className = "dialog-closebutton";
+              closeButton.addEventListener("click", () => {
+                document.body.removeChild(dialogOverlay);
+              });
+
+              dialogContent.appendChild(dialogMessage);
+              dialogContent.appendChild(paraText);
+              dialogContent.appendChild(entryList);
+              dialogContent.appendChild(closeButton);
+              dialogOverlay.appendChild(dialogContent);
+
+              document.body.appendChild(dialogOverlay);
+            });
+            break;
+          case "blacklisted":
+            chrome.storage.local.get(["blacklistedChannels"], (result) => {
+              list = result.blacklistedChannels || [];
+              const entryList = document.createElement("div");
+              entryList.className = "entrylist";
+
+              list.forEach((l) => {
+                const channelElement = document.createElement("div");
+                channelElement.className = "tags";
+                channelElement.textContent = l;
+
+                const removeButton = document.createElement("button");
+                removeButton.textContent = "x";
+                removeButton.addEventListener("click", () =>
+                  removeTag(l, "tags")
+                );
+
+                channelElement.appendChild(removeButton);
+                entryList.appendChild(channelElement);
+              });
+
+              const closeButton = document.createElement("button");
+              closeButton.textContent = "Close";
+              closeButton.className = "dialog-closebutton";
+              closeButton.addEventListener("click", () => {
+                document.body.removeChild(dialogOverlay);
+              });
+
+              dialogContent.appendChild(dialogMessage);
+              dialogContent.appendChild(paraText);
+              dialogContent.appendChild(entryList);
+              dialogContent.appendChild(closeButton);
+              dialogOverlay.appendChild(dialogContent);
+
+              document.body.appendChild(dialogOverlay);
+            });
+          break;
+  }
+
+  const dialogOverlay = document.createElement("div");
+  dialogOverlay.className = "modal-overlay";
+
+  const dialogContent = document.createElement("div");
+  dialogContent.className = "modal-content";
+
+  const dialogMessage = document.createElement("h3");
+  dialogMessage.textContent = header;
+
+  const paraText = document.createElement("p");
+  paraText.textContent = para;
+
+  
 };
