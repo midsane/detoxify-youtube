@@ -4,18 +4,41 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>YouTube Detoxify</title>
-<link rel="stylesheet" href="popup.css">
+  <link rel="stylesheet" href="popup.css">
 </head>
 <body>
   <h1><img src="icons/icon-16.png" alt="Logo"> Detoxify YouTube</h1>
-  
-  <div class="tags-container">
-    <h3>Current Tags</h3>
-    <div id="tagsList"></div>
+
+  <!-- Whitelisted Channels Section -->
+  <div class="whitelisted-container">
+    <h3>Whitelisted Channels</h3>
+    <div id="whitelistedChannelsPreview" class="whitelisted-channels-list"></div>
+    <div class="actions">
+      
+      <button id="addWhitelistedButton" class="action-button">+</button>
+    </div>
   </div>
 
-  <button id="addTagButton">+ Add Tag</button>
-   <script src="popup.js"></script>
+  <!-- Blacklisted Channels Section -->
+  <div class="blacklisted-container">
+    <h3>Blacklisted Channels</h3>
+    <div id="blacklistedChannelsPreview" class="blacklisted-channels-list"></div>
+    <div class="actions">
+      
+      <button id="addBlacklistedButton" class="action-button">+</button>
+    </div>
+  </div>
 
+  <!-- Tags Section -->
+  <div class="tags-container">
+    <h3>Current Tags</h3>
+    <div id="tagsPreview" class="tags-list"></div>
+    <div class="actions">
+      
+      <button id="addTagButton" class="action-button">+</button>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
 </body>
 </html>
